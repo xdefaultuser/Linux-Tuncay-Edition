@@ -1,0 +1,25 @@
+name: Build Linux Tuncay Edition
+on: [workflow_dispatch]
+jobs:
+  build-iso:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Live Build Tools
+        run: sudo apt-get update && sudo apt-get install -y live-build
+
+      - name: Setup Live Directory
+        run: |
+          mkdir tuncay_os && cd tuncay_os
+          lb config --architecture amd64 --distribution bookworm --binary-images iso-hybrid
+          echo "Linux Tuncay Edition" > config/package-lists/myos.list.chroot
+
+      - name: Build ISO Image
+        run: |
+          cd tuncay_os
+          sudo lb build
+
+      - name: Upload Tuncay OS ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tuncay-Edition-ISO
+          path: tuncay_os/*.iso
