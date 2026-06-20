@@ -12,16 +12,14 @@ jobs:
       - name: Setup Live Directory
         run: |
           mkdir tuncay_os && cd tuncay_os
-          # Depoların hepsini (main universe restricted multiverse) açıyoruz:
-          lb config --architecture amd64 --distribution noble --binary-images iso-hybrid \
-            --mirror-bootstrap "http://archive.ubuntu.com/ubuntu/" \
-            --mirror-binary "http://archive.ubuntu.com/ubuntu/" \
-            --parent-mirror-bootstrap "http://archive.ubuntu.com/ubuntu/" \
-            --parent-mirror-binary "http://archive.ubuntu.com/ubuntu/" \
-            --components "main universe restricted multiverse"
+          # Komutları sadeleştirip parametre hatasını engelliyoruz
+          lb config --architecture amd64 --distribution noble --binary-images iso-hybrid
+          
+          # GitHub sunucusunun kendi açık depolarını direkt ISO'nun içine kopyalıyoruz:
+          mkdir -p config/archives
+          sudo cp /etc/apt/sources.list config/archives/ubuntu.list.chroot || true
           
           mkdir -p config/package-lists
-          # Paketleri bulabilmesi için bu depolar şarttı
           echo "python3 python3-pip git xfce4 xfce4-goodies xorg" > config/package-lists/myos.list.chroot
 
       - name: Build ISO Image
