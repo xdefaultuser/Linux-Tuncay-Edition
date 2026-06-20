@@ -5,13 +5,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Live Build Tools
-        run: sudo apt-get update && sudo apt-get install -y live-build
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y live-build debootstrap
 
       - name: Setup Live Directory
         run: |
           mkdir tuncay_os && cd tuncay_os
-          lb config --architecture amd64 --distribution bookworm --binary-images iso-hybrid
-          echo "Linux Tuncay Edition" > config/package-lists/myos.list.chroot
+          lb config --architecture amd64 --distribution noble --binary-images iso-hybrid \
+            --mirror-bootstrap "http://archive.ubuntu.com/ubuntu/" \
+            --mirror-binary "http://archive.ubuntu.com/ubuntu/"
+          
+          mkdir -p config/package-lists
+          echo "python3 python3-pip git xfce4 xfce4-goodies xorg" > config/package-lists/myos.list.chroot
 
       - name: Build ISO Image
         run: |
